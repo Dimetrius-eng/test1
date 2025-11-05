@@ -1,5 +1,5 @@
 // --- Глобальні змінні ---
-let allWordsByCategory = {}; 
+let allWordsByCategory = {};  
 let availableWords = []; 
 let isSoundEnabled = true; 
 const SOUND_STORAGE_KEY = 'itAliasSound'; 
