@@ -119,14 +119,8 @@ p { color: #555; line-height: 1.6; }
     display: flex;
     justify-content: center;
     align-items: center;
-    
-    /* ЗМІНА ТУТ: Прибираємо автоматичні дефіси */
     word-wrap: break-word; 
     overflow-wrap: break-word;
-    /* -webkit-hyphens: auto; (ВИДАЛЕНО)
-      -ms-hyphens: auto; (ВИДАЛЕНО)
-      hyphens: auto; (ВИДАЛЕНО)
-    */
 }
 
 /* --- Екран передачі ходу --- */
@@ -186,7 +180,7 @@ button:disabled {
 /* --- Головне меню --- */
 #main-menu-screen h1 {
   margin-bottom: 30px;
-  margin-top: 50px; 
+  margin-top: 0; /* (Кнопки звуку тут немає) */
 }
 .menu-buttons {
   display: flex;
@@ -199,7 +193,7 @@ button:disabled {
 
 /* --- Екран правил --- */
 #rules-screen h2 { 
-    margin-top: 50px; 
+    margin-top: 0; 
 }
 .rules-content {
   text-align: left;
@@ -299,27 +293,20 @@ input[type="range"]::-moz-range-thumb {
   background-color: #e2e2e2;
 }
 
-/* --- Кнопка Звуку --- */
-.btn-sound {
-  position: absolute; 
-  top: 15px;
-  left: 15px; 
-  width: 44px;
-  height: 44px;
-  font-size: 1.2rem;
-  padding: 0;
-  margin: 0;
-  line-height: 44px;
-  text-align: center;
-  background-color: #f0f0f0;
-  color: #555;
-  border: 1px solid #ddd;
-  border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  z-index: 10; 
-  display: none; /* За замовчуванням сховано */
+/* --- (Старий .btn-sound видалено) --- */
+
+/* --- Кнопка Звуку (в Налаштуваннях) --- */
+.btn-sound-settings {
+    width: auto; 
+    max-width: 200px; 
+    margin: 15px auto 0; 
+    padding: 12px 20px;
+    font-size: 1.5rem; 
+    background-color: #f0f0f0;
+    color: #555;
+    border: 1px solid #ddd;
 }
-.btn-sound:hover {
+.btn-sound-settings:hover {
   background-color: #e2e2e2;
 }
 
