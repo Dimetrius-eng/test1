@@ -21,10 +21,8 @@ body {
     padding: 28px;
     text-align: center;
     overflow: hidden;
-    position: relative; 
-    
-    /* ЗМІНА ТУТ: Відступ зверху, щоб не налазити на кнопки */
-    margin-top: 60px; 
+    position: relative; /* Критично важливо */
+    margin-top: 0; /* Прибираємо старий відступ */
 }
 
 h1 { color: #0056b3; margin-top: 0; margin-bottom: 10px; }
@@ -87,7 +85,8 @@ p { color: #555; line-height: 1.6; }
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 20px;
-    /* (Забираємо margin-top, він тепер не потрібен) */
+    /* ЗНОВУ ДОДАЄМО ВІДСТУП, щоб не налазити на кнопки */
+    margin-top: 30px; 
 }
 .stat {
     text-align: center;
@@ -262,7 +261,7 @@ input[type="range"]::-moz-range-thumb {
 
 /* --- ЗМІНА ТУТ: Кнопка Паузи --- */
 .btn-pause {
-  position: fixed; /* Прив'язка до екрану */
+  position: absolute; /* Прив'язка до .game-container */
   top: 15px;
   left: 50%; /* Центруємо по горизонталі */
   transform: translateX(-50%); /* Точне центрування */
@@ -280,7 +279,7 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 50%; 
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   display: none; /* Сховано за замовчуванням */
-  z-index: 10; /* Переконатися, що вона зверху */
+  z-index: 10; 
 }
 .btn-pause:hover {
   background-color: #e2e2e2;
@@ -288,7 +287,7 @@ input[type="range"]::-moz-range-thumb {
 
 /* --- ЗМІНА ТУТ: Кнопка Звуку --- */
 .btn-sound {
-  position: fixed; /* Прив'язка до екрану */
+  position: absolute; /* Прив'язка до .game-container */
   top: 15px;
   left: 15px; 
   width: 44px;
@@ -303,7 +302,7 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid #ddd;
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  z-index: 10; /* Переконатися, що вона зверху */
+  z-index: 10; 
 }
 .btn-sound:hover {
   background-color: #e2e2e2;
