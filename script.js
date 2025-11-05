@@ -146,9 +146,9 @@ function stopSound(sound) {
 }
 function updateSoundIcon() {
   if (isSoundEnabled) {
-    soundToggleBtn.textContent = '🔊';
+    soundToggleBtn.textContent = 'Звук: Увімк. 🔊';
   } else {
-    soundToggleBtn.textContent = '🔇';
+    soundToggleBtn.textContent = 'Звук: Вимк. 🔇';
   }
 }
 function toggleSound() {
@@ -197,8 +197,7 @@ async function initializeApp() {
     continueBtn.disabled = false;
   }
   
-  pauseBtn.style.display = 'none'; 
-  soundToggleBtn.style.display = 'block'; // Звук видно на головному меню
+  pauseBtn.style.display = 'none'; // Кнопка паузи схована
   
   showScreen(mainMenuScreen); 
   scoreboard.style.display = 'none';
@@ -209,16 +208,11 @@ function showScreen(screenToShow) {
   screens.forEach(screen => screen.classList.remove('active'));
   screenToShow.classList.add('active');
   
-  // ЗМІНА ТУТ: Керуємо кнопками залежно від екрану
+  // Керуємо ТІЛЬКИ кнопкою паузи
   if (screenToShow === gameScreen) {
     pauseBtn.style.display = 'block';
-    soundToggleBtn.style.display = 'block';
-  } else if (screenToShow === pauseScreen) {
-    pauseBtn.style.display = 'none';
-    soundToggleBtn.style.display = 'none'; // Ховаємо звук на паузі
   } else {
     pauseBtn.style.display = 'none';
-    soundToggleBtn.style.display = 'block'; // Показуємо звук на всіх інших екранах
   }
 }
 
@@ -289,8 +283,6 @@ function startRound(isContinuation = false) {
   nextWord();
   showScreen(gameScreen);
   
-  // (Кнопки тепер керуються в 'showScreen')
-  
   startTimer();
   gameState.isRoundActive = true; 
   saveGameState(); 
@@ -350,9 +342,6 @@ function handleSkip() {
 function endRound() {
   clearInterval(timerInterval); 
   gameState.isRoundActive = false; 
-  
-  // (Кнопки керуються в 'showScreen', коли ми викликаємо 'showRoundSummary' або 'showWinner')
-  
   stopSound(sounds.tick); 
   playSound(sounds.timesUp); 
   
@@ -390,7 +379,6 @@ function updateScoreboard() {
   team2ScoreDisplay.textContent = gameState.team2Score;
 }
 function showWinner() {
-  // (Кнопки керуються в 'showScreen')
   let winnerMsg = "";
   if (gameState.team1Score > gameState.team2Score) winnerMsg = `🎉 Перемогла ${gameState.team1Name}! 🎉`;
   else if (gameState.team2Score > gameState.team1Score) winnerMsg = `🎉 Перемогла ${gameState.team2Name}! 🎉`;
@@ -401,7 +389,6 @@ function showWinner() {
 }
 function performReset() {
   stopSound(sounds.tick); 
-  // (Кнопки керуються в 'showScreen', коли ми викликаємо 'showScreen(mainMenuScreen)')
   
   gameState.isGameInProgress = false; 
   gameState.isRoundActive = false; 
