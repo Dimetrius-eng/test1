@@ -2,6 +2,11 @@
 let allWordsByCategory = {}; 
 let availableWords = []; 
 
+// --- НОВЕ: Змінні для Звуку ---
+let isSoundEnabled = true; // За замовчуванням звук увімкнено
+const SOUND_STORAGE_KEY = 'itAliasSound'; // "Блокнот" для налаштувань звуку
+let sounds = {}; // Об'єкт для зберігання завантажених звуків
+
 // --- Стан гри (те, що ми будемо зберігати) ---
 let gameState = {
   team1Score: 0,
@@ -57,6 +62,7 @@ const backButtons = document.querySelectorAll('.btn-primary[data-target], .btn-t
 const pauseBtn = document.getElementById('pause-btn');       
 const resumeBtn = document.getElementById('resume-btn');     
 const quitToMenuBtn = document.getElementById('quit-to-menu-btn'); 
+const soundToggleBtn = document.getElementById('sound-toggle-btn'); // НОВА КНОПКА
 const timerDisplay = document.getElementById('timer');
 const roundCounterDisplay = document.getElementById('round-counter'); 
 const wordDisplay = document.getElementById('word-display');
@@ -68,7 +74,7 @@ const finalScoreSummaryDisplay = document.getElementById('final-score-summary');
 
 // --- Прив'язуємо функції до кнопок ---
 newGameMenuBtn.addEventListener('click', () => {
-  const savedData = localStorage.getItem(STORAGE_KEY);
+  const savedData = localStorage.getItem(GAME_STORAGE_KEY);
   if (savedData) {
     if (confirm("Ви впевнені, що хочете почати нову гру? Весь збережений прогрес буде втрачено.")) {
       performReset(); 
@@ -86,16 +92,11 @@ continueBtn.addEventListener('click', continueGame);
 correctBtn.addEventListener('click', handleCorrect);
 skipBtn.addEventListener('click', handleSkip);
 nextTurnBtn.addEventListener('click', startRound);
-
-// Кнопка "Вийти в меню" (в кінці раунду) -> Зберігає (і питає)
 resetGameBtn.addEventListener('click', quitGame); 
-
-// Кнопка "Нова гра" (в кінці гри) -> НЕ зберігає
 newGameBtn.addEventListener('click', () => {
     performReset(); 
     showScreen(mainMenuScreen); 
 }); 
-
 backButtons.forEach(button => {
   button.addEventListener('click', (e) => {
     const targetScreenId = e.target.getAttribute('data-target');
@@ -107,27 +108,67 @@ backButtons.forEach(button => {
 });
 pauseBtn.addEventListener('click', pauseGame);
 resumeBtn.addEventListener('click', resumeGame);
-// Кнопка "Вийти в меню" (на паузі) -> Зберігає (і питає)
 quitToMenuBtn.addEventListener('click', quitGame); 
-
+soundToggleBtn.addEventListener('click', toggleSound); // НОВЕ
 timeSlider.oninput = function() { timeOutput.value = this.value; }
 roundsSlider.oninput = function() { roundsOutput.value = this.value; }
 
 // --- Робота зі сховищем (localStorage) ---
-const STORAGE_KEY = 'itAliasSavedGame';
-function saveGameState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState)); }
+const GAME_STORAGE_KEY = 'itAliasSavedGame'; 
+function saveGameState() { localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(gameState)); }
 function loadGameState() {
-  const savedData = localStorage.getItem(STORAGE_KEY);
+  const savedData = localStorage.getItem(GAME_STORAGE_KEY);
   if (savedData) {
     gameState = JSON.parse(savedData);
     return true; 
   }
   return false; 
 }
-function clearGameState() { localStorage.removeItem(STORAGE_KEY); }
+function clearGameState() { localStorage.removeItem(GAME_STORAGE_KEY); }
+
+// --- НОВІ ФУНКЦІЇ: Логіка Звуку ---
+function loadSounds() {
+  try {
+    sounds.correct = new Audio('sounds/correct.mp3');
+    sounds.skip = new Audio('sounds/skip.mp3');
+    sounds.timesUp = new Audio('sounds/times-up.mp3');
+    sounds.tick = new Audio('sounds/tick.mp3');
+    console.log("Звуки завантажено.");
+  } catch (e) {
+    console.error("Помилка завантаження звуків. Перевірте папку 'sounds'.", e);
+    isSoundEnabled = false; 
+  }
+}
+function playSound(sound) {
+  if (isSoundEnabled && sound) {
+    sound.currentTime = 0;
+    sound.play().catch(e => console.warn("Помилка програвання звуку:", e));
+  }
+}
+function updateSoundIcon() {
+  if (isSoundEnabled) {
+    soundToggleBtn.textContent = '🔊';
+  } else {
+    soundToggleBtn.textContent = '🔇';
+  }
+}
+function toggleSound() {
+  isSoundEnabled = !isSoundEnabled;
+  localStorage.setItem(SOUND_STORAGE_KEY, isSoundEnabled);
+  updateSoundIcon();
+}
+function loadSoundPreference() {
+  const savedSoundSetting = localStorage.getItem(SOUND_STORAGE_KEY);
+  if (savedSoundSetting !== null) {
+    isSoundEnabled = (savedSoundSetting === 'true');
+  }
+  updateSoundIcon();
+}
 
 // --- Ініціалізація гри (Запуск) ---
 async function initializeApp() {
+  loadSoundPreference();
+  loadSounds();
   newGameMenuBtn.disabled = true;
   continueBtn.disabled = true;
   try {
@@ -232,6 +273,12 @@ function startTimer() {
   timerInterval = setInterval(() => {
     timeLeft--;
     timerDisplay.textContent = timeLeft;
+    
+    // Звук "тікання"
+    if (timeLeft <= 5 && timeLeft > 0) {
+      playSound(sounds.tick);
+    }
+
     if (timeLeft <= 0) {
       endRound(); 
     }
@@ -249,11 +296,21 @@ function nextWord() {
   const newWord = availableWords.pop(); 
   wordDisplay.textContent = newWord;
 }
-function handleCorrect() { roundScore++; nextWord(); }
-function handleSkip() { nextWord(); }
+function handleCorrect() {
+  roundScore++; 
+  playSound(sounds.correct); // Звук
+  nextWord();
+}
+function handleSkip() {
+  playSound(sounds.skip); // Звук
+  nextWord();
+}
 function endRound() {
   clearInterval(timerInterval); 
   gameState.isRoundActive = false; 
+  
+  playSound(sounds.timesUp); // Звук
+
   if (gameState.currentTeam === 1) gameState.team1Score += roundScore;
   else gameState.team2Score += roundScore;
   gameState.lastRoundScore = roundScore; 
@@ -261,7 +318,7 @@ function endRound() {
   if (gameState.currentTeam === 2 && gameState.currentRound >= gameState.totalRounds) {
     gameState.isGameInProgress = false; 
     showWinner();
-    clearGameState(); // Очищуємо, бо гра завершена
+    clearGameState(); 
   } else {
     gameState.currentTeam = (gameState.currentTeam === 1) ? 2 : 1;
     showRoundSummary(false); 
@@ -296,8 +353,6 @@ function showWinner() {
   finalScoreSummaryDisplay.textContent = `Фінальний рахунок: ${gameState.team1Name} (${gameState.team1Score}) - ${gameState.team2Name} (${gameState.team2Score})`;
   showScreen(gameOverScreen); 
 }
-
-// Ця функція викликається ТІЛЬКИ з `newGameMenuBtn`
 function performReset() {
   gameState.isGameInProgress = false; 
   gameState.isRoundActive = false; 
@@ -325,21 +380,15 @@ function resumeGame() {
   showScreen(gameScreen); 
   startTimer(); 
 }
-
-// Функція "Вийти в меню" (з Паузи або з Кінця раунду)
 function quitGame() {
-  // Гра ще не закінчена (isGameInProgress = true), тому ми ЗАВЖДИ питаємо
   if (!confirm("Вийти в головне меню? Ваш прогрес буде збережено.")) {
-      return; // Користувач натиснув "Скасувати"
+      return; 
   }
-  
-  // Якщо "Так", то зберігаємо і виходимо
   clearInterval(timerInterval); 
-  gameState.isRoundActive = false; // Позначаємо, що ми не в активному раунді
-  saveGameState(); // Зберігаємо прогрес
-  
+  gameState.isRoundActive = false; 
+  saveGameState(); 
   scoreboard.style.display = 'none'; 
-  initializeApp(); // Перезапускаємо, щоб показати "Продовжити"
+  initializeApp(); 
 }
 
 // --- ЗАПУСК ДОДАТКУ ---
