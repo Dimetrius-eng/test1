@@ -1,10 +1,10 @@
-// ВЕРСІЯ 27 - Виправлення дефісів (hyphens)
-const CACHE_NAME = 'it-alias-v27-hyphen-fix';
+// ВЕРСІЯ 29 - Кнопка звуку в Налаштуваннях + maxlength
+const CACHE_NAME = 'it-alias-v29-sound-in-settings';
 
 const urlsToCache = [
   './',
   './index.html',
-  './style.css', // Цей файл оновиться
+  './style.css',
   './script.js',
   './manifest.json',
   './words.json',
@@ -22,7 +22,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Відкрито кеш v27');
+        console.log('Відкрито кеш v29');
         const localUrls = urlsToCache.filter(url => !url.startsWith('http'));
         const externalUrls = urlsToCache.filter(url => url.startsWith('http'));
         
@@ -32,7 +32,7 @@ self.addEventListener('install', event => {
             return Promise.all(externalRequests.map(req => cache.add(req)));
           });
       })
-      .catch(err => console.error('Помилка cache.addAll у v27:', err))
+      .catch(err => console.error('Помилка cache.addAll у v29:', err))
   );
 });
 
@@ -48,7 +48,7 @@ self.addEventListener('fetch', event => {
 
 // 3. Подія "activate" (оновлюємо "білий список")
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME]; // Залишити тільки v27
+  const cacheWhitelist = [CACHE_NAME]; // Залишити тільки v29
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -61,7 +61,7 @@ self.addEventListener('activate', event => {
       );
     })
     .then(() => {
-        console.log('Service Worker v27 активовано і перехоплює контроль!');
+        console.log('Service Worker v29 активовано і перехоплює контроль!');
         return self.clients.claim();
     })
   );
