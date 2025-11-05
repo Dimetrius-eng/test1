@@ -1,5 +1,5 @@
-// ВЕРСІЯ 31 - Останнє слово + Анімації
-const CACHE_NAME = 'it-alias-v31-last-word-animation';
+// ВЕРСІЯ 32 - Повне виправлення помилок HTML/CSS/JS
+const CACHE_NAME = 'it-alias-v32-full-fix';
 
 const urlsToCache = [
   './',
@@ -22,7 +22,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Відкрито кеш v31');
+        console.log('Відкрито кеш v32');
         const localUrls = urlsToCache.filter(url => !url.startsWith('http'));
         const externalUrls = urlsToCache.filter(url => url.startsWith('http'));
         
@@ -32,7 +32,7 @@ self.addEventListener('install', event => {
             return Promise.all(externalRequests.map(req => cache.add(req)));
           });
       })
-      .catch(err => console.error('Помилка cache.addAll у v31:', err))
+      .catch(err => console.error('Помилка cache.addAll у v32:', err))
   );
 });
 
@@ -61,7 +61,7 @@ self.addEventListener('activate', event => {
       );
     })
     .then(() => {
-        console.log('Service Worker v31 активовано і перехоплює контроль!');
+        console.log('Service Worker v32 активовано і перехоплює контроль!');
         return self.clients.claim();
     })
   );
