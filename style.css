@@ -61,8 +61,9 @@ p { color: #555; line-height: 1.6; }
     gap: 15px;
     margin: 25px 0;
 }
-/* (Прибрано margin-top для h2, бо кнопка паузи тепер не заважає) */
-
+.settings h2 { 
+    margin-top: 0; 
+}
 .settings input[type="text"] {
     width: 100%;
     padding: 14px;
@@ -122,9 +123,36 @@ p { color: #555; line-height: 1.6; }
     overflow-wrap: break-word;
 }
 
+/* --- НОВИЙ ЕКРАН: Останнє слово --- */
+#last-word-screen h2 {
+    margin-top: 50px;
+    color: #d9534f; 
+}
+#last-word-display {
+    font-size: 2rem; 
+    font-weight: 600;
+    color: #000;
+    background-color: #f0f8ff; 
+    border: 2px dashed #007bff;
+    border-radius: 12px;
+    padding: 40px 20px;
+    margin-bottom: 15px;
+    min-height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+}
+#last-word-screen p {
+    font-weight: 600;
+    color: #555;
+}
+
+
 /* --- Екран передачі ходу --- */
 #turn-end-screen h2 { 
-    margin-top: 0; /* (Прибрано margin-top) */
+    margin-top: 50px; 
 }
 .next-turn-text { font-size: 1.2rem; font-weight: 600; margin: 20px 0; }
 #next-team-name { color: #007bff; }
@@ -134,7 +162,7 @@ p { color: #555; line-height: 1.6; }
 #game-over-screen h2 {
     color: #007bff;
     font-size: 1.8rem;
-    margin-top: 0; /* (Прибрано margin-top) */
+    margin-top: 50px; 
 }
 #winner-message {
     font-size: 1.5rem;
