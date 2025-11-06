@@ -28,7 +28,7 @@ const mainMenuScreen = document.getElementById('main-menu-screen');
 const settingsScreen = document.getElementById('settings-screen'); 
 const rulesScreen = document.getElementById('rules-screen');     
 const gameScreen = document.getElementById('game-screen');
-const lastWordScreen = document.getElementById('last-word-screen'); // НОВИЙ
+const lastWordScreen = document.getElementById('last-word-screen'); 
 const turnEndScreen = document.getElementById('turn-end-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const pauseScreen = document.getElementById('pause-screen'); 
@@ -66,9 +66,9 @@ const roundSummaryDisplay = document.getElementById('round-summary');
 const nextTeamNameDisplay = document.getElementById('next-team-name');
 const winnerMessageDisplay = document.getElementById('winner-message'); 
 const finalScoreSummaryDisplay = document.getElementById('final-score-summary');
-const lastWordDisplay = document.getElementById('last-word-display'); // НОВИЙ
-const lastWordCorrectBtn = document.getElementById('last-word-correct-btn'); // НОВИЙ
-const lastWordSkipBtn = document.getElementById('last-word-skip-btn'); // НОВИЙ
+const lastWordDisplay = document.getElementById('last-word-display'); 
+const lastWordCorrectBtn = document.getElementById('last-word-correct-btn'); 
+const lastWordSkipBtn = document.getElementById('last-word-skip-btn'); 
 
 // --- Прив'язуємо функції до кнопок ---
 newGameMenuBtn.addEventListener('click', () => {
@@ -84,7 +84,17 @@ newGameMenuBtn.addEventListener('click', () => {
   }
 });
 rulesBtn.addEventListener('click', () => showScreen(rulesScreen));
-startBtn.addEventListener('click', setupNewGame);
+
+// ЗМІНА ТУТ: "Розблокування" аудіо
+startBtn.addEventListener('click', () => {
+    // Примусово "розбудити" і завантажити всі звуки
+    if (isSoundEnabled) {
+        Object.values(sounds).forEach(sound => sound.load());
+    }
+    // Запускаємо гру
+    setupNewGame();
+});
+
 continueBtn.addEventListener('click', continueGame); 
 correctBtn.addEventListener('click', handleCorrect);
 skipBtn.addEventListener('click', handleSkip);
@@ -109,8 +119,8 @@ quitToMenuBtn.addEventListener('click', quitGame);
 soundToggleBtn.addEventListener('click', toggleSound); 
 timeSlider.oninput = function() { timeOutput.value = this.value; }
 roundsSlider.oninput = function() { roundsOutput.value = this.value; }
-lastWordCorrectBtn.addEventListener('click', handleLastWordCorrect); // НОВИЙ
-lastWordSkipBtn.addEventListener('click', handleLastWordSkip); // НОВИЙ
+lastWordCorrectBtn.addEventListener('click', handleLastWordCorrect);
+lastWordSkipBtn.addEventListener('click', handleLastWordSkip);
 
 
 // --- Робота зі сховищем (localStorage) ---
@@ -206,6 +216,7 @@ async function initializeApp() {
   
   pauseBtn.style.display = 'none'; 
   
+  // (Код v30 - без анімацій)
   showScreen(mainMenuScreen); 
   scoreboard.style.display = 'none';
 }
@@ -257,6 +268,12 @@ function continueGame() {
   roundsSlider.value = gameState.totalRounds;
   roundsOutput.value = gameState.totalRounds;
   categorySelect.value = gameState.selectedCategory; 
+  
+  // ЗМІНА ТУТ: Примусово "розбудити" аудіо
+  if (isSoundEnabled) {
+      Object.values(sounds).forEach(sound => sound.load());
+  }
+
   if (gameState.isRoundActive) {
     startRound(true); 
   } else {
@@ -347,7 +364,7 @@ function handleSkip() {
   nextWord();
 }
 
-// ЗМІНА ТУТ: endRound() тепер переходить на "Останнє слово"
+// ЗМІНА ТУТ: Додаємо логіку "Останнього слова"
 function endRound() {
   clearInterval(timerInterval); 
   gameState.isRoundActive = false; 
@@ -390,6 +407,7 @@ function finishRoundLogic() {
     saveGameState(); 
   }
 }
+
 
 function showRoundSummary(isContinuation = false) {
   if (isContinuation) {
@@ -447,17 +465,31 @@ function resumeGame() {
   showScreen(gameScreen); 
   startTimer(); 
 }
+
+// ЗМІНА ТУТ: Виправлення багу v36
 function quitGame() {
   if (!confirm("Вийти в головне меню? Ваш прогрес буде збережено.")) {
       return; 
   }
+  
   clearInterval(timerInterval); 
   stopSound(sounds.tick); 
   
   gameState.isRoundActive = false; 
   saveGameState(); 
+  
   scoreboard.style.display = 'none'; 
-  initializeApp(); 
+  
+  // НЕ викликаємо initializeApp()
+  showScreen(mainMenuScreen);
+  
+  // Оновлюємо кнопку "Продовжити" вручну
+  if (loadGameState() && gameState.isGameInProgress) {
+    continueBtn.style.display = 'block';
+    continueBtn.disabled = false;
+  } else {
+    continueBtn.style.display = 'none';
+  }
 }
 
 // --- ЗАПУСК ДОДАТКУ ---
